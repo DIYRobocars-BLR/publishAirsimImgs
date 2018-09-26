@@ -12,13 +12,20 @@ This repository is developed based on the work forked from github user: rakeshsh
   
 [![AirSim_to_RVIZ_image_streaming](extras/airsim_rviz_picture.png)](https://youtu.be/Ubqx9WifekQ)
   
+  
+# Install Unreal 4.18, AirSim v1.2 (build with clang++)
+I assume that you already have installed Unreal 4.18 and AirSim v1.2 built on your machine. If not, then follow the link below.
+https://github.com/Microsoft/AirSim/blob/master/docs/build_linux.md  
+
+ Please note that there is another instance of AirSim that has to be built with g++ instead of clang++ and is mentioned in the subsequent steps
+
 
 # Build AirSim using g++
-Here is my fork of the AirSim that can build with g++. [AirSim fork g++](https://github.com/aravindk2604/AirSim.git). Fork this repository and/or dowload it on your machine and navigate to the AirSim directory.  
+This is the other instance of AirSim which is my fork that can build with g++. [AirSim fork g++](https://github.com/aravindk2604/AirSim.git). Fork this repository and/or dowload it on your machine and navigate to the AirSim directory.  
 ```
 git clone https://github.com/aravindk2604/AirSim.git
 ```
-
+Henceforth I will only discuss about the AirSim built with g++
 Export the path of the AirSim directory as an environment variable `AIRSIM_PATH` before building the project.
   
 ```
@@ -37,7 +44,7 @@ sudo apt-get install libeigen3-dev
 sudo apt-get install ros-kinetic-mavros ros-kinetic-mavros-extras
 ```
 - CMAKE 3.12.1
-Follow the answer posted by Teocci on Stack Exchange [link](https://askubuntu.com/questions/355565/how-do-i-install-the-latest-version-of-cmake-from-the-command-line?rq=1)
+Follow the answer posted by `Teocci` on Stack Exchange [link](https://askubuntu.com/questions/355565/how-do-i-install-the-latest-version-of-cmake-from-the-command-line?rq=1)
 
 - Clang++ v3.9 or newer to support C++14
 
@@ -74,13 +81,29 @@ Make clang 3.9 as the default version by the command:
 sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-3.9 60 --slave /usr/bin/clang++ clang++ /usr/bin/clang++-3.9
 ```
 
-- Copy the `publishAirsimImgs` repository into your catkin workspace
+- Geoid Model dataset - install this package in your global packages that is common for your entire machine.
+```
+wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
+
+sudo chmod +x install_geographiclib_datasets.sh
+
+./install_geographiclib_datasets.sh
+```
+
+
+- Git clone this `publishAirsimImgs` repository into your catkin workspace
 
 ```
 cd ~/catkin_ws/src/
 git clone git@github.com:aravindk2604/publishAirsimImgs.git
 cd ~/catkin_ws
 catkin_make
+```
+
+- Install Python Airsim APIs
+```
+# AirSim APIs
+pip install airsim
 ```
 
 # Run
@@ -104,6 +127,13 @@ roslaunch airsim_img_publisher mavrosAirsim.launch
 ```
 roslaunch airsim_img_publisher pubImages.launch
 ```
+
+- To run the Python-based Airsim interface, run the following instead of pubimages.launch:
+
+```
+rosrun airsim_img_publisher airsim_iface.py
+```
+
 
 - Run the TurtleBot's teleop node to control the car in the AirSim environment. Note, you will need the ros-kinetic-turtlebot package for this.
 ```
